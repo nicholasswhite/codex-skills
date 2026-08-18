@@ -210,13 +210,18 @@ def tree_digest(files: list[tuple[str, bytes]]) -> str:
 
 
 def _payloads(data: bytes, counter: list[int]) -> tuple[str, list[tuple[str, bytes]]]:
+    counter[0] += 1
+    if not data:
+        # GitHub rejects blank Gist files. Carry an explicit nonblank marker and
+        # reconstruct the original zero-byte file from the manifest encoding.
+        return "empty", [(f"blob-{counter[0]:06d}.txt", b"EMPTY\n")]
+
     try:
-        data.decode("utf-8")
-        is_text = len(data) <= MAX_PAYLOAD_BYTES
+        text = data.decode("utf-8")
+        is_text = len(data) <= MAX_PAYLOAD_BYTES and not text.isspace()
     except UnicodeDecodeError:
         is_text = False
 
-    counter[0] += 1
     if is_text:
         return "utf-8", [(f"blob-{counter[0]:06d}.txt", data)]
 
@@ -371,7 +376,7 @@ def reconstruct(capsule_dir: Path) -> tuple[dict, list[tuple[str, bytes]]]:
             raise CapsuleError(f"duplicate or case-colliding path: {relative}")
         exact.add(relative)
         folded.add(folded_path)
-        if item["encoding"] not in {"utf-8", "base64"}:
+        if item["encoding"] not in {"utf-8", "base64", "empty"}:
             raise CapsuleError(f"unsupported encoding for {relative}")
         if not isinstance(item["size"], int) or item["size"] < 0 or item["size"] > MAX_FILE_BYTES:
             raise CapsuleError(f"invalid declared size for {relative}")
@@ -386,11 +391,14 @@ def reconstruct(capsule_dir: Path) -> tuple[dict, list[tuple[str, bytes]]]:
         ):
             raise CapsuleError(f"missing payload sources for {relative}")
         payload = bytearray()
-        encoded_limit = (
-            item["size"]
-            if item["encoding"] == "utf-8"
-            else 4 * ((item["size"] + 2) // 3)
-        )
+        if item["encoding"] == "empty":
+            if item["size"] != 0 or len(item["sources"]) != 1:
+                raise CapsuleError(f"invalid empty payload declaration for {relative}")
+            encoded_limit = len(b"EMPTY\n")
+        elif item["encoding"] == "utf-8":
+            encoded_limit = item["size"]
+        else:
+            encoded_limit = 4 * ((item["size"] + 2) // 3)
         for source_name in item["sources"]:
             safe_source = _safe_relative_path(source_name)
             if "/" in safe_source:
@@ -408,7 +416,14 @@ def reconstruct(capsule_dir: Path) -> tuple[dict, list[tuple[str, bytes]]]:
                 raise CapsuleError(f"encoded payload exceeds the declared size for {relative}")
             payload.extend(source_path.read_bytes())
         try:
-            data = bytes(payload) if item["encoding"] == "utf-8" else base64.b64decode(payload, validate=True)
+            if item["encoding"] == "utf-8":
+                data = bytes(payload)
+            elif item["encoding"] == "empty":
+                if bytes(payload) != b"EMPTY\n":
+                    raise CapsuleError(f"invalid empty payload marker for {relative}")
+                data = b""
+            else:
+                data = base64.b64decode(payload, validate=True)
         except ValueError as exc:
             raise CapsuleError(f"invalid base64 payload for {relative}") from exc
         if len(data) != item["size"]:

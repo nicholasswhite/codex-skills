@@ -23,6 +23,7 @@ class GistCapsuleTests(unittest.TestCase):
         (skill / "SKILL.md").write_text("---\nname: example-skill\ndescription: Test.\n---\n", encoding="utf-8")
         (skill / "scripts" / "run.py").write_text("print('ok')\n", encoding="utf-8")
         (skill / "assets" / "data.bin").write_bytes(b"\x00\xff\x01")
+        (skill / "assets" / "whitespace.txt").write_bytes(b"\n")
         (skill / "__pycache__" / "ignored.pyc").write_bytes(b"ignored")
         (skill / "outputs" / "ignored.txt").write_text("ignored", encoding="utf-8")
         (skill / "outputs" / ".gitkeep").write_bytes(b"")
@@ -51,9 +52,16 @@ class GistCapsuleTests(unittest.TestCase):
             self.assertEqual("codex-skill-gist/v1", manifest["schema"])
             self.assertEqual((skill / "SKILL.md").read_bytes(), (destination / "SKILL.md").read_bytes())
             self.assertEqual(b"\x00\xff\x01", (destination / "assets" / "data.bin").read_bytes())
+            self.assertEqual(b"\n", (destination / "assets" / "whitespace.txt").read_bytes())
             self.assertFalse((destination / "__pycache__").exists())
             self.assertFalse((destination / "outputs" / "ignored.txt").exists())
             self.assertTrue((destination / "outputs" / ".gitkeep").is_file())
+
+            entries = {item["path"]: item for item in manifest["files"]}
+            self.assertEqual("empty", entries["outputs/.gitkeep"]["encoding"])
+            self.assertEqual("base64", entries["assets/whitespace.txt"]["encoding"])
+            for payload in output.glob("blob-*"):
+                self.assertTrue(payload.read_bytes().strip(), payload.name)
 
     def test_rejects_traversal_and_case_collisions(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
