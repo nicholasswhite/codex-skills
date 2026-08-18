@@ -1,0 +1,67 @@
+{
+  "schema": "codex-skills-catalog/v1",
+  "repository": "https://github.com/nicholasswhite/codex-skills",
+  "sourceRef": "4a24c36f6d828e7320a4674a63dfdf056e06232b",
+  "skills": [
+    {
+      "name": "daily-reflection",
+      "path": "daily-reflection",
+      "treeSha256": "57e00093cd9bffd74f0f0e7945dc1e692c2002377444feeab6edcb2cf8061bf2",
+      "gist": {
+        "id": "49c3c874b0eb2fb1139ebf9683811d44",
+        "url": "https://gist.github.com/nicholasswhite/49c3c874b0eb2fb1139ebf9683811d44",
+        "revision": "c3ac2285b7db5d308fb3f01e87a2ffb06ddb5f8e"
+      }
+    },
+    {
+      "name": "i-am-not-a-smart-man",
+      "path": "i-am-not-a-smart-man",
+      "treeSha256": "3aaa09767f50b519cb87ccc7cbe8609f21885f9c658dcf80ae6fabc2f38840fa",
+      "gist": {
+        "id": "e747c6e4c3f42db17008f77c949f1dd9",
+        "url": "https://gist.github.com/nicholasswhite/e747c6e4c3f42db17008f77c949f1dd9",
+        "revision": "5f794a8a2f01bdd30e4c45a72ab12d44d781e3b8"
+      }
+    },
+    {
+      "name": "learn-from-source",
+      "path": "learn-from-source",
+      "treeSha256": "c73307416bac09d1f7776c164b9d9b476c2f198d3aa737beda03ce222af5f99f",
+      "gist": {
+        "id": "95e12970070397d174cb99d965129339",
+        "url": "https://gist.github.com/nicholasswhite/95e12970070397d174cb99d965129339",
+        "revision": "f5367f68a3854998f78b337e935e29d77012be8a"
+      }
+    },
+    {
+      "name": "prepare-workos-objective",
+      "path": "prepare-workos-objective",
+      "treeSha256": "92c648bb385838288fc793dcef165cedcaf786ed14e957312e7ad2f901efce48",
+      "gist": {
+        "id": "a193a5d42682f0cac7fa53d8afe4838c",
+        "url": "https://gist.github.com/nicholasswhite/a193a5d42682f0cac7fa53d8afe4838c",
+        "revision": "605c9cbf09377f18005a88e542e03f7eeb30190c"
+      }
+    },
+    {
+      "name": "session-handoff",
+      "path": "session-handoff",
+      "treeSha256": "c0aed65e8b0c9f418609cf9f7356968063080811444e1e544a2fc0b6eca10f04",
+      "gist": {
+        "id": "8d5879a02f1945af0fb008bb3fad534f",
+        "url": "https://gist.github.com/nicholasswhite/8d5879a02f1945af0fb008bb3fad534f",
+        "revision": "4abce15fcb56dc45926cc1d9dd39073539074cfc"
+      }
+    },
+    {
+      "name": "transcribe-anything",
+      "path": "transcribe-anything",
+      "treeSha256": "a5baf5c2019467acc72ba4bba492191054f9bfc1608867a1814184df8784508b",
+      "gist": {
+        "id": "c0932b4943874669e8da34ff245abe3d",
+        "url": "https://gist.github.com/nicholasswhite/c0932b4943874669e8da34ff245abe3d",
+        "revision": "46a863a15a5dc678e0d49e90b27e00324e48ab19"
+      }
+    }
+  ]
+}
