@@ -1,7 +1,7 @@
 {
   "schema": "codex-skills-catalog/v1",
   "repository": "https://github.com/nicholasswhite/codex-skills",
-  "sourceRef": "4a24c36f6d828e7320a4674a63dfdf056e06232b",
+  "sourceRef": "986e0436b1d206cc48a0ed43293262da62fa2bca",
   "skills": [
     {
       "name": "daily-reflection",
@@ -10,7 +10,7 @@
       "gist": {
         "id": "49c3c874b0eb2fb1139ebf9683811d44",
         "url": "https://gist.github.com/nicholasswhite/49c3c874b0eb2fb1139ebf9683811d44",
-        "revision": "c3ac2285b7db5d308fb3f01e87a2ffb06ddb5f8e"
+        "revision": "29db386a417248e407b995a42cb80f9b128682d7"
       }
     },
     {
@@ -20,7 +20,7 @@
       "gist": {
         "id": "e747c6e4c3f42db17008f77c949f1dd9",
         "url": "https://gist.github.com/nicholasswhite/e747c6e4c3f42db17008f77c949f1dd9",
-        "revision": "5f794a8a2f01bdd30e4c45a72ab12d44d781e3b8"
+        "revision": "b960579c4ea2d0fb719cee96edc4505d37bb3f3e"
       }
     },
     {
@@ -30,7 +30,7 @@
       "gist": {
         "id": "95e12970070397d174cb99d965129339",
         "url": "https://gist.github.com/nicholasswhite/95e12970070397d174cb99d965129339",
-        "revision": "f5367f68a3854998f78b337e935e29d77012be8a"
+        "revision": "2dbc7851156d09c94cbb14edfd3071e840b5706a"
       }
     },
     {
@@ -40,7 +40,7 @@
       "gist": {
         "id": "a193a5d42682f0cac7fa53d8afe4838c",
         "url": "https://gist.github.com/nicholasswhite/a193a5d42682f0cac7fa53d8afe4838c",
-        "revision": "605c9cbf09377f18005a88e542e03f7eeb30190c"
+        "revision": "5aec772bab79ee2ff55def75fc0b6d5f2fdd553d"
       }
     },
     {
@@ -50,7 +50,7 @@
       "gist": {
         "id": "8d5879a02f1945af0fb008bb3fad534f",
         "url": "https://gist.github.com/nicholasswhite/8d5879a02f1945af0fb008bb3fad534f",
-        "revision": "4abce15fcb56dc45926cc1d9dd39073539074cfc"
+        "revision": "fd2fc0c7e4f4c113255888db0c5270159d54da29"
       }
     },
     {
@@ -60,7 +60,7 @@
       "gist": {
         "id": "c0932b4943874669e8da34ff245abe3d",
         "url": "https://gist.github.com/nicholasswhite/c0932b4943874669e8da34ff245abe3d",
-        "revision": "46a863a15a5dc678e0d49e90b27e00324e48ab19"
+        "revision": "dc6b6d2caced0935fde96becc124f4b6b066143a"
       }
     }
   ]
