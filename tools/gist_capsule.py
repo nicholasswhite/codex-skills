@@ -33,7 +33,7 @@ EXCLUDED_DIRS = {
     "__pycache__",
 }
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
-RESERVED_CAPSULE_FILES = {"00-README.md", "CAPSULE.v1.json", "UNPACK.py"}
+RESERVED_CAPSULE_FILES = {".gitattributes", "00-README.md", "CAPSULE.v1.json", "UNPACK.py"}
 WINDOWS_RESERVED_NAMES = {
     "AUX",
     "CON",
@@ -320,6 +320,9 @@ def build_capsule(
     )
     (output / "00-README.md").write_text(about, encoding="utf-8")
     shutil.copyfile(Path(__file__).resolve(), output / "UNPACK.py")
+    # Payload hashes cover exact bytes. Prevent a Windows checkout from
+    # translating LF to CRLF before the capsule verifier sees those bytes.
+    (output / ".gitattributes").write_bytes(b"* -text\n")
     return manifest
 
 

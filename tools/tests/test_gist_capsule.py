@@ -60,6 +60,7 @@ class GistCapsuleTests(unittest.TestCase):
             entries = {item["path"]: item for item in manifest["files"]}
             self.assertEqual("empty", entries["outputs/.gitkeep"]["encoding"])
             self.assertEqual("base64", entries["assets/whitespace.txt"]["encoding"])
+            self.assertEqual(b"* -text\n", (output / ".gitattributes").read_bytes())
             for payload in output.glob("blob-*"):
                 self.assertTrue(payload.read_bytes().strip(), payload.name)
 
