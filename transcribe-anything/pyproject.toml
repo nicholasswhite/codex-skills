@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "transcribe-anything"
+version = "0.1.0"
+description = "Transcribe local audio/video files and accessible public media links."
+readme = "README.md"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+  "fastapi>=0.115,<1",
+  "imageio-ffmpeg>=0.6,<1",
+  "openai>=2,<3",
+  "python-dotenv>=1.1,<2",
+  "python-multipart>=0.0.20,<1",
+  "uvicorn[standard]>=0.34,<1",
+  "yt-dlp>=2026.7.4",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx2>=2.10,<3",
+  "pytest>=8.3,<10",
+  "pytest-cov>=6,<8",
+  "ruff>=0.9,<1",
+]
+
+[project.scripts]
+transcribe-anything = "transcribe_anything.cli:main"
+transcribe-anything-web = "transcribe_anything.web.app:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/transcribe_anything"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/transcribe_anything/web/static" = "transcribe_anything/web/static"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]

@@ -1,0 +1,4 @@
+interface:
+  display_name: "I Am Not a Smart Man"
+  short_description: "Explain projects plainly with diagrams"
+  default_prompt: "Use $i-am-not-a-smart-man to explain this project in plain language and create a local HTML report."

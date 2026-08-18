@@ -1,0 +1,4 @@
+interface:
+  display_name: "Session Handoff"
+  short_description: "Create durable, verifiable project handoffs"
+  default_prompt: "Use $session-handoff to wrap up this project and prepare a continuation prompt."

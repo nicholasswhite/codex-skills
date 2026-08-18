@@ -1,0 +1,4 @@
+interface:
+  display_name: "Learn From Source"
+  short_description: "Turn external sources into approved improvements"
+  default_prompt: "Use $learn-from-source to evaluate this source, propose evidence-based improvements, and wait for my approval before changing anything."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prepare WorkOS Objective"
+  short_description: "Turn project context into a WorkOS objective"
+  default_prompt: "Use $prepare-workos-objective to turn this project context into one consolidated WorkOS Owner Objective."

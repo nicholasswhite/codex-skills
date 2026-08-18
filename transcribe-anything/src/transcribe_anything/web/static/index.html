@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Transcribe Anything</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">AUDIO → TEXT</p>
+        <h1>Transcribe<br /><em>anything.</em></h1>
+        <p class="lede">Drop in audio or video, or paste an accessible public link.</p>
+      </header>
+
+      <section class="panel" aria-labelledby="source-heading">
+        <h2 id="source-heading">Choose a source</h2>
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-source="file" type="button">Upload file</button>
+          <button class="tab" data-source="url" type="button">Paste link</button>
+        </div>
+
+        <form id="transcription-form">
+          <div id="file-source" class="source-pane">
+            <label class="drop-zone" for="media-file">
+              <input id="media-file" name="media_file" type="file" accept="audio/*,video/*,.mkv,.m4a,.webm,.ogg,.flac" />
+              <span class="drop-icon">＋</span>
+              <strong>Choose a media file</strong>
+              <small id="file-name">Audio or video</small>
+            </label>
+          </div>
+
+          <div id="url-source" class="source-pane hidden">
+            <label for="source-url">Public media URL</label>
+            <input id="source-url" name="source_url" type="url" placeholder="https://…" autocomplete="off" />
+            <p class="hint">Public, accessible media only. Private and DRM-protected links are not supported.</p>
+          </div>
+
+          <details>
+            <summary>Transcript options</summary>
+            <div class="options-grid">
+              <label>Provider<select id="provider" name="provider"></select></label>
+              <label>Model<input id="model" name="model" list="model-options" autocomplete="off" required /><datalist id="model-options"></datalist></label>
+              <label>Language hint<input id="language" name="language" maxlength="8" placeholder="Auto-detect" /></label>
+            </div>
+            <fieldset>
+              <legend>Downloads</legend>
+              <div id="formats" class="checks"></div>
+            </fieldset>
+          </details>
+
+          <div id="config-warning" class="notice hidden"></div>
+          <button class="submit" type="submit"><span>Start transcription</span><span aria-hidden="true">↗</span></button>
+        </form>
+      </section>
+
+      <section id="status" class="status hidden" aria-live="polite">
+        <div class="spinner"></div>
+        <div><strong>Transcribing media…</strong><p>Long recordings may take several minutes.</p></div>
+      </section>
+
+      <section id="result" class="result hidden" aria-live="polite">
+        <div class="result-header"><div><p class="eyebrow">COMPLETE</p><h2>Your transcript</h2></div><div id="downloads" class="downloads"></div></div>
+        <pre id="preview"></pre>
+      </section>
+
+      <section id="error" class="error hidden" aria-live="assertive"></section>
+    </main>
+    <footer>Files are processed for this job; temporary source media is deleted after transcription.</footer>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

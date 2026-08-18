@@ -1,0 +1,4 @@
+interface:
+  display_name: "Daily Reflection"
+  short_description: "Reflect, learn, and safely improve Codex work"
+  default_prompt: "Use $daily-reflection to review today's work in this project, save the lessons, automatically apply safe high-confidence improvements, and ask only for high-impact changes."

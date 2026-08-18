@@ -1,0 +1,4 @@
+interface:
+  display_name: "Transcribe Anything"
+  short_description: "Transcribe media files and public links"
+  default_prompt: "Use $transcribe-anything to transcribe this file or public media link."
