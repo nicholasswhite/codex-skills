@@ -7,6 +7,7 @@ import argparse
 import base64
 import hashlib
 import json
+import ntpath
 import os
 import re
 import shutil
@@ -42,6 +43,12 @@ WINDOWS_RESERVED_NAMES = {
     "PRN",
     *(f"COM{index}" for index in range(1, 10)),
     *(f"LPT{index}" for index in range(1, 10)),
+    "COM¹",
+    "COM²",
+    "COM³",
+    "LPT¹",
+    "LPT²",
+    "LPT³",
 }
 WINDOWS_FORBIDDEN_CHARS = set('<>:"\\|?*')
 
@@ -59,6 +66,17 @@ def _is_link(path: Path) -> bool:
     return path.is_symlink() or is_junction()
 
 
+def _windows_name_is_reserved(name: str) -> bool:
+    if name.endswith((".", " ")) or any(ord(char) < 32 for char in name):
+        return True
+    if any(char in WINDOWS_FORBIDDEN_CHARS for char in name):
+        return True
+    checker = getattr(ntpath, "isreserved", None)
+    if checker is not None and checker(name):
+        return True
+    return name.partition(".")[0].rstrip(" ").upper() in WINDOWS_RESERVED_NAMES
+
+
 def _safe_relative_path(value: str) -> str:
     if not isinstance(value, str) or not value or "\\" in value or "\x00" in value:
         raise CapsuleError("manifest paths must be non-empty POSIX relative paths")
@@ -66,13 +84,8 @@ def _safe_relative_path(value: str) -> str:
     if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
         raise CapsuleError(f"unsafe manifest path: {value!r}")
     for part in path.parts:
-        if part.endswith((".", " ")) or any(ord(char) < 32 for char in part):
-            raise CapsuleError(f"Windows-normalized manifest path: {value!r}")
-        if any(char in WINDOWS_FORBIDDEN_CHARS for char in part):
-            raise CapsuleError(f"Windows-unsafe manifest path: {value!r}")
-        device_stem = part.split(".", 1)[0].upper()
-        if device_stem in WINDOWS_RESERVED_NAMES:
-            raise CapsuleError(f"Windows device manifest path: {value!r}")
+        if _windows_name_is_reserved(part):
+            raise CapsuleError(f"Windows-reserved manifest path: {value!r}")
     return path.as_posix()
 
 

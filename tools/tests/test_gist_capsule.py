@@ -84,6 +84,10 @@ class GistCapsuleTests(unittest.TestCase):
             "file:stream",
             "CON",
             "folder/aux.txt",
+            "COM¹.txt",
+            "LPT³.log",
+            "CON .txt",
+            "COM1 .html",
             "trailing.",
             "trailing ",
         )

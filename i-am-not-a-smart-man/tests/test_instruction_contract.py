@@ -191,7 +191,18 @@ class InstructionContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             with self.assertRaisesRegex(ValueError, "plain filename"):
                 renderer.render("# Safe", Path(temp_dir), filename="../escaped")
-            for filename in ("D:outside", "file:stream", "CON", "AUX.txt", "trailing.", "trailing "):
+            for filename in (
+                "D:outside",
+                "file:stream",
+                "CON",
+                "AUX.txt",
+                "COM¹.txt",
+                "LPT³.log",
+                "CON .txt",
+                "COM1 .html",
+                "trailing.",
+                "trailing ",
+            ):
                 with self.subTest(filename=filename):
                     with self.assertRaises(ValueError):
                         renderer.render("# Safe", Path(temp_dir), filename=filename)

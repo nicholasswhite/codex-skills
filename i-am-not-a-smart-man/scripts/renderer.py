@@ -5,6 +5,7 @@ HTML page with safely embedded Mermaid diagram support.
 """
 
 import html
+import ntpath
 import re
 from pathlib import Path
 
@@ -19,7 +20,24 @@ WINDOWS_RESERVED_FILENAMES = {
     "PRN",
     *(f"COM{index}" for index in range(1, 10)),
     *(f"LPT{index}" for index in range(1, 10)),
+    "COM¹",
+    "COM²",
+    "COM³",
+    "LPT¹",
+    "LPT²",
+    "LPT³",
 }
+
+
+def _windows_name_is_reserved(name: str) -> bool:
+    if name.endswith((".", " ")) or any(ord(char) < 32 for char in name):
+        return True
+    if any(char in WINDOWS_FORBIDDEN_FILENAME_CHARS for char in name):
+        return True
+    checker = getattr(ntpath, "isreserved", None)
+    if checker is not None and checker(name):
+        return True
+    return name.partition(".")[0].rstrip(" ").upper() in WINDOWS_RESERVED_FILENAMES
 
 
 # ---------------------------------------------------------------------------
@@ -158,12 +176,7 @@ def render(
 
     if not filename or Path(filename).name != filename or filename in {".", ".."}:
         raise ValueError("filename must be a plain filename without path separators")
-    if (
-        filename.endswith((".", " "))
-        or any(ord(char) < 32 for char in filename)
-        or any(char in WINDOWS_FORBIDDEN_FILENAME_CHARS for char in filename)
-        or filename.split(".", 1)[0].upper() in WINDOWS_RESERVED_FILENAMES
-    ):
+    if _windows_name_is_reserved(filename):
         raise ValueError("filename is not safe on Windows filesystems")
 
     # ---- HTML ----
