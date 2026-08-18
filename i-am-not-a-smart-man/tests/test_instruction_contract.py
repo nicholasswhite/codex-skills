@@ -179,7 +179,7 @@ class InstructionContractTests(unittest.TestCase):
     def test_renderer_uses_pinned_strict_mermaid(self) -> None:
         template = (SKILL_ROOT / "assets" / "report.html").read_text(encoding="utf-8")
 
-        self.assertIn("mermaid@10.9.5", template)
+        self.assertIn("mermaid@10.9.6", template)
         self.assertIn('integrity="sha384-', template)
         self.assertIn("securityLevel:'strict'", template)
         self.assertIn("htmlLabels:false", template)
@@ -191,6 +191,10 @@ class InstructionContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             with self.assertRaisesRegex(ValueError, "plain filename"):
                 renderer.render("# Safe", Path(temp_dir), filename="../escaped")
+            for filename in ("D:outside", "file:stream", "CON", "AUX.txt", "trailing.", "trailing "):
+                with self.subTest(filename=filename):
+                    with self.assertRaises(ValueError):
+                        renderer.render("# Safe", Path(temp_dir), filename=filename)
 
 
 if __name__ == "__main__":

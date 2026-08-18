@@ -111,7 +111,7 @@ class GistCapsuleTests(unittest.TestCase):
             _, output = self.build(root)
             payload = next(output.glob("blob-*.txt"))
             payload.write_bytes(payload.read_bytes() + b"tampered")
-            with self.assertRaisesRegex(capsule.CapsuleError, "mismatch"):
+            with self.assertRaisesRegex(capsule.CapsuleError, "mismatch|exceeds"):
                 capsule.reconstruct(output)
 
         with tempfile.TemporaryDirectory() as temp:
@@ -121,6 +121,26 @@ class GistCapsuleTests(unittest.TestCase):
             destination.mkdir()
             with self.assertRaisesRegex(capsule.CapsuleError, "already exists"):
                 capsule.unpack_capsule(output, destination)
+
+    def test_rejects_repeated_sources_and_oversized_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, output = self.build(root)
+            manifest_path = output / "CAPSULE.v1.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["files"][0]["sources"] *= capsule.MAX_SOURCES_PER_FILE + 1
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(capsule.CapsuleError, "payload sources"):
+                capsule.reconstruct(output)
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            _, output = self.build(root)
+            manifest_path = output / "CAPSULE.v1.json"
+            with manifest_path.open("ab") as stream:
+                stream.write(b" " * capsule.MAX_MANIFEST_BYTES)
+            with self.assertRaisesRegex(capsule.CapsuleError, "manifest-size"):
+                capsule.reconstruct(output)
 
     def test_source_must_not_contain_links(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

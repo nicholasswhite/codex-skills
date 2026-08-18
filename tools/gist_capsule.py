@@ -18,9 +18,11 @@ from pathlib import Path, PurePosixPath
 
 SCHEMA = "codex-skill-gist/v1"
 MAX_PAYLOAD_BYTES = 700_000
+MAX_MANIFEST_BYTES = 2_000_000
 MAX_FILES = 1_000
 MAX_FILE_BYTES = 10_000_000
 MAX_TOTAL_BYTES = 100_000_000
+MAX_SOURCES_PER_FILE = 32
 EXCLUDED_DIRS = {
     ".git",
     ".mypy_cache",
@@ -312,6 +314,8 @@ def _load_manifest(capsule_dir: Path) -> dict:
     manifest_path = capsule_dir / "CAPSULE.v1.json"
     if _is_link(manifest_path) or not manifest_path.is_file():
         raise CapsuleError("CAPSULE.v1.json is missing or linked")
+    if manifest_path.stat().st_size > MAX_MANIFEST_BYTES:
+        raise CapsuleError("CAPSULE.v1.json exceeds the manifest-size limit")
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
@@ -356,9 +360,24 @@ def reconstruct(capsule_dir: Path) -> tuple[dict, list[tuple[str, bytes]]]:
         folded.add(folded_path)
         if item["encoding"] not in {"utf-8", "base64"}:
             raise CapsuleError(f"unsupported encoding for {relative}")
-        if not isinstance(item["sources"], list) or not item["sources"]:
+        if not isinstance(item["size"], int) or item["size"] < 0 or item["size"] > MAX_FILE_BYTES:
+            raise CapsuleError(f"invalid declared size for {relative}")
+        if not isinstance(item["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", item["sha256"]):
+            raise CapsuleError(f"invalid SHA-256 for {relative}")
+        if (
+            not isinstance(item["sources"], list)
+            or not item["sources"]
+            or len(item["sources"]) > MAX_SOURCES_PER_FILE
+            or not all(isinstance(source, str) for source in item["sources"])
+            or len(set(item["sources"])) != len(item["sources"])
+        ):
             raise CapsuleError(f"missing payload sources for {relative}")
         payload = bytearray()
+        encoded_limit = (
+            item["size"]
+            if item["encoding"] == "utf-8"
+            else 4 * ((item["size"] + 2) // 3)
+        )
         for source_name in item["sources"]:
             safe_source = _safe_relative_path(source_name)
             if "/" in safe_source:
@@ -371,16 +390,17 @@ def reconstruct(capsule_dir: Path) -> tuple[dict, list[tuple[str, bytes]]]:
                 raise CapsuleError(f"payload escapes the capsule directory: {safe_source}")
             if source_path.stat().st_size > MAX_PAYLOAD_BYTES:
                 raise CapsuleError(f"payload exceeds the {MAX_PAYLOAD_BYTES}-byte limit: {safe_source}")
+            payload_size = source_path.stat().st_size
+            if len(payload) + payload_size > encoded_limit:
+                raise CapsuleError(f"encoded payload exceeds the declared size for {relative}")
             payload.extend(source_path.read_bytes())
         try:
             data = bytes(payload) if item["encoding"] == "utf-8" else base64.b64decode(payload, validate=True)
         except ValueError as exc:
             raise CapsuleError(f"invalid base64 payload for {relative}") from exc
-        if not isinstance(item["size"], int) or item["size"] < 0 or item["size"] > MAX_FILE_BYTES:
-            raise CapsuleError(f"invalid declared size for {relative}")
         if len(data) != item["size"]:
             raise CapsuleError(f"size mismatch for {relative}")
-        if not isinstance(item["sha256"], str) or _sha256(data) != item["sha256"]:
+        if _sha256(data) != item["sha256"]:
             raise CapsuleError(f"SHA-256 mismatch for {relative}")
         files.append((relative, data))
         total_size += len(data)

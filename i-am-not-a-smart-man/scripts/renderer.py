@@ -9,6 +9,17 @@ import re
 from pathlib import Path
 
 HTML_TEMPLATE_PATH = Path(__file__).resolve().parents[1] / "assets" / "report.html"
+WINDOWS_FORBIDDEN_FILENAME_CHARS = set('<>:"/\\|?*')
+WINDOWS_RESERVED_FILENAMES = {
+    "AUX",
+    "CON",
+    "CONIN$",
+    "CONOUT$",
+    "NUL",
+    "PRN",
+    *(f"COM{index}" for index in range(1, 10)),
+    *(f"LPT{index}" for index in range(1, 10)),
+}
 
 
 # ---------------------------------------------------------------------------
@@ -142,11 +153,18 @@ def render(
 
     Returns the path to the generated HTML file.
     """
-    output_dir = Path(output_dir)
+    output_dir = Path(output_dir).resolve(strict=False)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     if not filename or Path(filename).name != filename or filename in {".", ".."}:
         raise ValueError("filename must be a plain filename without path separators")
+    if (
+        filename.endswith((".", " "))
+        or any(ord(char) < 32 for char in filename)
+        or any(char in WINDOWS_FORBIDDEN_FILENAME_CHARS for char in filename)
+        or filename.split(".", 1)[0].upper() in WINDOWS_RESERVED_FILENAMES
+    ):
+        raise ValueError("filename is not safe on Windows filesystems")
 
     # ---- HTML ----
     html_body = _markdown_to_html_body(explanation)
@@ -157,7 +175,9 @@ def render(
         "{{CONTENT}}", html_body
     )
 
-    html_path = output_dir / f"{filename}.html"
+    html_path = (output_dir / f"{filename}.html").resolve(strict=False)
+    if not html_path.is_relative_to(output_dir):
+        raise ValueError("output path escapes the requested directory")
     html_path.write_text(html_content, encoding="utf-8")
 
     return html_path
